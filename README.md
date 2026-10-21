@@ -61,7 +61,7 @@ L'application est accessible depuis un navigateur Web à l'adresse :
 **http://192.168.65.132:3003** (redirection de port vers la VM Vagrant).
 
 Capture de l'application accessible dans le navigateur :
-![Application Ma Garderie](screenshots/a4-30-application-vagrant.png)
+![Application Ma Garderie](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-30-application-vagrant.png?raw=true)
 
 ## 8. Autres captures d'écran
 
