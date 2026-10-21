@@ -71,12 +71,3 @@ https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-17-vagr
 
 Docker installé dans la VM Vagrant :
 https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-23-docker-vm.png?raw=true
-
-text
-
-**Action :**
-1. Colle ce texte dans ton fichier `README.md` (dans VS Code).
-2. Sauvegarde (`Ctrl+S`).
-3. Fais le `git add .`, `git commit -m "Correction finale README"` et `git push`.
-
-Dis-moi quand c'est fait, et cette fois les images s'afficheront parfaitement !
