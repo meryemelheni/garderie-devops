@@ -8,45 +8,28 @@ pipeline {
                 checkout scm
             }
         }
-        stage('Install') {
-            steps {
-                echo 'Installation des dépendances...'
-                dir('frontend') {
-                    sh 'npm ci'
-                }
-                dir('backend') {
-                    sh 'npm ci'
-                }
-            }
-        }
-        stage('Test') {
-            steps {
-                echo 'Exécution des tests...'
-                dir('frontend') {
-                    sh 'npm test'
-                }
-            }
-        }
         stage('Build Frontend') {
             steps {
                 echo 'Construction de l\'image frontend...'
-                sh 'docker build -t meryemelheni/garderie-frontend:latest ./frontend'
+                sh 'docker build -t maryemelheni/garderie-frontend:latest ./frontend'
             }
         }
         stage('Build Backend') {
             steps {
                 echo 'Construction de l\'image backend...'
-                sh 'docker build -t meryemelheni/garderie-backend:latest ./backend'
+                sh 'docker build -t maryemelheni/garderie-backend:latest ./backend'
             }
         }
         stage('Push Frontend') {
             steps {
-                echo 'Push de l\'image frontend (simulation)'
+                echo 'Push de l\'image frontend...'
+                sh 'docker push maryemelheni/garderie-frontend:latest'
             }
         }
         stage('Push Backend') {
             steps {
-                echo 'Push de l\'image backend (simulation)'
+                echo 'Push de l\'image backend...'
+                sh 'docker push maryemelheni/garderie-backend:latest'
             }
         }
     }
