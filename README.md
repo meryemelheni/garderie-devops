@@ -38,8 +38,8 @@ Créer un job "Pipeline script from SCM" pointant vers ce dépôt.
 Lancer le build.
 
 Capture du pipeline Jenkins exécuté avec succès :
-https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-13-pipeline-succes.png?raw=true
-https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-13-console-succes.png?raw=true
+![Pipeline Jenkins]https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-13-pipeline-succes.png?raw=true
+![Pipeline Jenkins]https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-13-console-succes.png?raw=true
 
 5. Liens vers les images Docker Hub
 Frontend : maryemelheni/garderie-frontend
@@ -47,7 +47,7 @@ Frontend : maryemelheni/garderie-frontend
 Backend : maryemelheni/garderie-backend
 
 Capture des images publiées sur Docker Hub :
-https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-14-dockerhub-images.png?raw=true
+![Pipeline Jenkins]https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-14-dockerhub-images.png?raw=true
 
 6. Instructions de déploiement avec Docker Compose
 Sur la VM Vagrant (déploiement depuis Docker Hub) :
@@ -56,18 +56,18 @@ bash
 docker run -d --name backend -p 3001:3001 maryemelheni/garderie-backend:latest
 docker run -d --name frontend -p 3000:3000 -e API_URL=http://172.17.0.1:3001 maryemelheni/garderie-frontend:latest
 Capture des conteneurs en cours d'exécution dans la VM Vagrant :
-https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-27-docker-compose-vagrant.png?raw=true
+![Pipeline Jenkins]https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-27-docker-compose-vagrant.png?raw=true
 
 7. Adresse d'accès à l'application déployée
 L'application est accessible depuis un navigateur Web à l'adresse :
 http://192.168.65.132:3003 (redirection de port vers la VM Vagrant).
 
 Capture de l'application accessible dans le navigateur :
-https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-30-application-vagrant.png?raw=true
+![Pipeline Jenkins]https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-30-application-vagrant.png?raw=true
 
 8. Autres captures d'écran
 Statut de la VM Vagrant :
-https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-17-vagrant-status.png?raw=true
+![Pipeline Jenkins]https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-17-vagrant-status.png?raw=true
 
 Docker installé dans la VM Vagrant :
 https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-23-docker-vm.png?raw=true
