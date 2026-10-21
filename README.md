@@ -71,3 +71,7 @@ https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-17-vagr
 
 Docker installé dans la VM Vagrant :
 https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-23-docker-vm.png?raw=true
+
+
+
+
