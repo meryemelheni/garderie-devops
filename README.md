@@ -73,9 +73,9 @@ Statut de la VM Vagrant :
 ![Statut VM Vagrant](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-17-vagrant-status.png?raw=true)
 
 Docker installé dans la VM Vagrant :
-<<<<<<< Updated upstream
+
 ![Docker VM Vagrant](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-23-docker-vm.png?raw=true)
-=======
+
 https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-23-docker-vm.png?raw=true
 
 
@@ -96,4 +96,100 @@ https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-23-dock
 | API9: Improper Inventory Management | Inventaire incomplet | API versionnée (`/api/...`) et documentée dans le README |
 | API10: Unsafe Consumption of APIs | Consommation non sécurisée d'API tierces | Aucune API tierce consommée pour l'instant |
 
->>>>>>> Stashed changes
+## 13. Base de données PostgreSQL
+
+Un service PostgreSQL a été ajouté dans le fichier docker-compose.yml :
+
+  db:
+    image: postgres:16-alpine
+    container_name: garderie-db
+    environment:
+      POSTGRES_USER: garderie_user
+      POSTGRES_PASSWORD: garderie_password
+      POSTGRES_DB: garderie_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - garderie-net
+
+Lancement de la base :
+docker compose up -d db
+
+Vérification :
+docker compose ps
+
+Capture de PostgreSQL en cours d'exécution :
+![PostgreSQL Up](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-53-postgresql-up.png?raw=true)
+
+## 14. Enregistrement des messages dans PostgreSQL
+
+L'API Express a été modifiée pour enregistrer les messages du formulaire dans la table contacts.
+
+Création de la table (via psql) :
+CREATE TABLE contacts (
+    id SERIAL PRIMARY KEY,
+    nom VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+Vérification dans la base :
+docker exec -it garderie-db psql -U garderie_user -d garderie_db -c "SELECT * FROM contacts;"
+
+Capture de la réponse de l'API :
+![API Success](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-54-api-success.png?raw=true)
+
+Capture de la console du serveur :
+![Console Log](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-54-console-log.png?raw=true)
+
+Capture du message enregistré dans la table :
+![Table contacts](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-54-postgresql-table.png?raw=true)
+
+## 15. Variables d'environnement
+
+Le fichier .env.example a été mis à jour avec les variables de la base de données :
+DOCKERHUB_USER=votre_user_dockerhub
+POSTGRES_USER=garderie_user
+POSTGRES_PASSWORD=garderie_password
+POSTGRES_DB=garderie_db
+DATABASE_URL=postgresql://garderie_user:garderie_password@localhost:5432/garderie_db
+
+## 16. Tests applicatifs
+
+Test du frontend :
+cd frontend
+npm test
+
+Capture du test frontend réussi :
+![Test Frontend](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-57-test-frontend.png?raw=true)
+
+Test de l'API :
+cd backend
+npm test
+
+Capture du test API réussi :
+![Test API](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-58-test-api.png?raw=true)
+
+## 12. Sécurité de l'API (OWASP API Security Top 10)
+
+Capture du tableau OWASP :
+![OWASP Table](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-52-owasp-table.png?raw=true)
+
+## 11. Validation et sécurité de l'API
+
+Capture du test avec des données invalides (Zod) :
+![Zod Error](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-48-zod-error.png?raw=true)
+
+Capture des headers de sécurité (Helmet) :
+![Helmet Headers](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-50-helmet-headers.png?raw=true)
+
+Capture du Rate Limiting (429 Too Many Requests) :
+![Rate Limit](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-51-rate-limit.png?raw=true)
+
+## 10. Route POST /api/contact
+
+Capture du succès de l'envoi du formulaire :
+![Contact Success](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-47-contact-success.png?raw=true)
