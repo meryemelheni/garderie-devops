@@ -1,87 +1,179 @@
-# Projet Garderie DevOps
+# Projet Garderie DevOps (Activités 3 et 4)
 
-Application Ma Garderie : frontend Next.js + backend Express, avec CI/CD Jenkins, VM Vagrant, provisioning Ansible et déploiement Docker Compose.
+## Activité 3 : Ansible, API Express et Dockerisation
 
-## 1. Présentation de l'application et technologies
+### 25. Installation d'Ansible sur une VM d'administration
 
-- Frontend : Next.js (App Router) avec les composants Navbar, Hero et Services.
-- Backend : Node.js / Express avec 3 API REST (/api/garderie, /api/services, /api/activites).
-- Tests : Jest pour le frontend (vérification du titre Ma Garderie).
-- Conteneurisation : Docker & Docker Compose.
-- CI/CD : Jenkins (Pipeline as Code).
-- Infrastructure : Vagrant + Ansible.
+Ansible a été installé sur la VM Vagrant (`vagrant-ubuntu`). L'installation s'est faite via `pip` pour avoir une version récente compatible avec Python 3.12.
 
-## 2. Architecture du projet et de la chaîne CI/CD
+Commandes :
+sudo apt update
+sudo apt install -y python3-pip
+pip3 install --user ansible
 
-- frontend/ : code source Next.js, Dockerfile, tests.
-- backend/ : code source Express, Dockerfile.
-- ansible/ : inventaire, playbook site.yml, rôle docker.
-- Jenkinsfile : pipeline Jenkins (Checkout, Build Frontend, Build Backend).
-- docker-compose.yml : lancement des deux services sur un réseau Docker.
-- Vagrantfile : création de la VM Ubuntu (2 Go RAM, 2 CPU, IP fixe 192.168.56.10).
+### 26. Fichier inventory et test de communication
 
-Chaîne CI/CD :
-Le code est poussé sur GitHub, Jenkins récupère le code et construit les images Docker (Push vers Docker Hub).
+Le fichier `inventory` contient l'adresse de la VM cible (`ubuntuserver`) :
 
-## 3. Instructions de création et provisioning de la VM
+Fichier inventory :
+[serveurs]
+ubuntuserver ansible_host=192.168.65.132 ansible_user=meryem ansible_ssh_private_key_file=/home/vagrant/.ssh/id_ansible
 
-Commande :
-vagrant up
+Test de communication :
+ansible all -m ping -i inventory
 
-La VM utilise le box generic/ubuntu2204 avec 2 Go de RAM et 2 CPU.
-Note : Le provisioning Ansible automatique a rencontré un problème de dossier partagé, les commandes du rôle Ansible ont donc été appliquées manuellement pour installer Docker dans la VM.
+Résultat : SUCCESS avec "ping": "pong".
 
-## 4. Instructions d'exécution du pipeline Jenkins
+![Test Ansible ping](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a3-27-playbook-curl.png?raw=true)
 
-1. Lancer Jenkins (service sur le port 8080).
-2. Créer un job Pipeline script from SCM pointant vers ce dépôt.
-3. Lancer le build.
+### 27. Premier playbook Ansible (installation de curl)
 
-Capture du pipeline Jenkins exécuté avec succès :
-![Pipeline Jenkins](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-13-pipeline-succes.png?raw=true)
-![Console Output](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-13-console-succes.png?raw=true)
+Le playbook `install_curl.yml` installe le package `curl`.
 
-## 5. Liens vers les images Docker Hub
+Exécution du playbook :
+ansible-playbook -i inventory install_curl.yml
 
-- Frontend : https://hub.docker.com/r/maryemelheni/garderie-frontend
-- Backend : https://hub.docker.com/r/maryemelheni/garderie-backend
+![Playbook curl](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a3-27-playbook-curl.png?raw=true)
 
-Capture des images publiées sur Docker Hub :
-![Docker Hub](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-14-dockerhub-images.png?raw=true)
+### 28. Playbook Ansible pour installer Docker
 
-## 6. Instructions de déploiement avec Docker Compose
+Le playbook `install_docker.yml` installe Docker et ses dépendances.
 
-Sur la VM Vagrant (déploiement depuis Docker Hub) :
+Résultat après exécution :
+docker --version
+Docker version 29.8.1, build 4a63305
 
-docker run -d --name backend -p 3001:3001 maryemelheni/garderie-backend:latest
-docker run -d --name frontend -p 3000:3000 -e API_URL=http://172.17.0.1:3001 maryemelheni/garderie-frontend:latest
+![Playbook Docker](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a3-28-playbook-docker.png?raw=true)
 
-Capture des conteneurs en cours d'exécution dans la VM Vagrant :
-![Conteneurs Vagrant](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-27-docker-compose-vagrant.png?raw=true)
+### 29. Création de l'API Node.js / Express
 
-## 7. Adresse d'accès à l'application déployée
+L'API se trouve dans le dossier `api/`. Structure :
+- `api/server.js` : serveur Express
+- `api/package.json` : dépendances (`express`, `cors`)
 
-L'application est accessible depuis un navigateur Web à l'adresse :
-http://192.168.65.132:3003 (redirection de port vers la VM Vagrant).
+Lancement : node server.js
 
-Capture de l'application accessible dans le navigateur :
-![Application Ma Garderie](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-30-application-vagrant.png?raw=true)
+![API démarrée](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a3-29-api-demarree.png?raw=true)
+![Structure API](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a3-29-structure-api.png?raw=true)
 
-## 8. Autres captures d'écran
+### 30. Route GET /api/health
 
-Statut de la VM Vagrant :
-![Statut VM Vagrant](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-17-vagrant-status.png?raw=true)
+Retourne l'état de l'API :
+{"status":"OK","message":"L'API fonctionne correctement"}
 
-Docker installé dans la VM Vagrant :
+![Health](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a3-30-api-health.png?raw=true)
 
-![Docker VM Vagrant](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-23-docker-vm.png?raw=true)
+### 31. Route GET /api/profile
 
-https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-23-docker-vm.png?raw=true
+Retourne les informations du portfolio :
+![Profile](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a3-31-api-profile.png?raw=true)
 
+### 32. Route GET /api/projects
 
-# Activité 4 : Vagrant, Ansible, Sécurité API et DevSecOps
+Retourne la liste des projets :
+![Projects](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a3-32-api-projects.png?raw=true)
 
-## 12. Sécurité de l'API (OWASP API Security Top 10)
+### 33. Route GET /api/skills
+
+Retourne la liste des compétences :
+![Skills](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a3-33-api-skills.png?raw=true)
+
+### 34. Frontend Next.js connecté à l'API (Projets)
+
+Le composant `components/Projects.js` a été modifié pour récupérer les projets depuis l'API Express via `fetch()`.
+
+![Frontend connecté à l'API](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a3-34-35-frontend-api.png?raw=true)
+
+### 35. Frontend Next.js connecté à l'API (Compétences)
+
+Même principe pour le composant `components/Skills.js`. Les données viennent désormais de l'API.
+
+### 36. Variable d'environnement API_URL
+
+L'URL de l'API est configurée via la variable `API_URL` (dans `.env.local`). Il ne faut pas la coder en dur car elle change entre le développement local (`http://localhost:3001`) et la production (`http://api:3001` dans Docker). Cela permet de déployer la même application dans différents environnements sans modifier le code.
+
+### 37. Fichier .env.example
+
+Contenu :
+API_URL=http://localhost:3001
+
+### 38. Dockerfile pour le frontend Next.js
+
+Le `Dockerfile` utilise une construction multi-stage pour optimiser l'image. Il compile le code avec Node.js puis copie le résultat dans une image légère.
+
+### 39. Dockerfile pour l'API Express
+
+Le `Dockerfile` de l'API installe les dépendances de production et lance `node server.js`.
+
+### 40. Construction des images Docker
+
+Commande utilisée :
+docker compose -f docker-compose.activite3.yml build
+
+![Build des images](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a3-40-docker-images.png?raw=true)
+
+### 41. Fichier Docker Compose (Frontend + API)
+
+Le fichier `docker-compose.activite3.yml` déclare les deux services. Le frontend utilise la variable `API_URL=http://api:3001` pour communiquer avec l'API via le réseau Docker.
+
+Lancement et vérification :
+docker compose -f docker-compose.activite3.yml up -d
+docker compose -f docker-compose.activite3.yml ps
+
+![Docker compose up](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a3-41-docker-compose-up.png?raw=true)
+![Docker compose ps](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a3-41-docker-compose-ps.png?raw=true)
+
+### 42. Communication Frontend / API via Docker Compose
+
+Le frontend communique avec l'API à travers le réseau Docker Compose (en utilisant le nom de service `api`). Le portfolio affiche les données fournies par l'API.
+
+![Portfolio avec Docker Compose](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a3-42-portfolio-compose.png?raw=true)
+
+---
+
+## Activité 4 : Vagrant, Ansible, Sécurité API et DevSecOps
+
+### 43. Vagrant et Ansible (déploiement automatique)
+
+(À compléter avec les captures et le texte du point 43)
+
+### 44. Configuration Vagrant pour Ansible
+
+(À compléter avec les captures et le texte du point 44)
+
+### 45. Vagrant destroy et vagrant up
+
+(À compléter avec les captures et le texte du point 45)
+
+### 46. Route POST /api/contact
+
+Capture du succès de l'envoi du formulaire :
+![Contact Success](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-47-contact-success.png?raw=true)
+
+### 47. Formulaire de contact Next.js
+
+(À compléter avec les captures et le texte du point 47)
+
+### 48. Validation Zod
+
+Capture du test avec des données invalides :
+![Zod Error](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-48-zod-error.png?raw=true)
+
+### 49. Gestion centralisée des erreurs
+
+(À compléter avec les captures et le texte du point 49)
+
+### 50. Headers de sécurité (Helmet)
+
+Capture des headers de sécurité (Helmet) :
+![Helmet Headers](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-50-helmet-headers.png?raw=true)
+
+### 51. Rate Limiting
+
+Capture du Rate Limiting (429 Too Many Requests) :
+![Rate Limit](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-51-rate-limit.png?raw=true)
+
+### 52. OWASP API Security Top 10
 
 | Risque OWASP | Description | Mesure mise en place |
 |---|---|---|
@@ -96,7 +188,10 @@ https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-23-dock
 | API9: Improper Inventory Management | Inventaire incomplet | API versionnée (`/api/...`) et documentée dans le README |
 | API10: Unsafe Consumption of APIs | Consommation non sécurisée d'API tierces | Aucune API tierce consommée pour l'instant |
 
-## 13. Base de données PostgreSQL
+Capture du tableau OWASP :
+![OWASP Table](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-52-owasp-table.png?raw=true)
+
+### 53. Base de données PostgreSQL
 
 Un service PostgreSQL a été ajouté dans le fichier docker-compose.yml :
 
@@ -123,7 +218,7 @@ docker compose ps
 Capture de PostgreSQL en cours d'exécution :
 ![PostgreSQL Up](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-53-postgresql-up.png?raw=true)
 
-## 14. Enregistrement des messages dans PostgreSQL
+### 54. Enregistrement des messages dans PostgreSQL
 
 L'API Express a été modifiée pour enregistrer les messages du formulaire dans la table contacts.
 
@@ -141,14 +236,12 @@ docker exec -it garderie-db psql -U garderie_user -d garderie_db -c "SELECT * FR
 
 Capture de la réponse de l'API :
 ![API Success](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-54-api-success.png?raw=true)
-
 Capture de la console du serveur :
 ![Console Log](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-54-console-log.png?raw=true)
-
 Capture du message enregistré dans la table :
 ![Table contacts](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-54-postgresql-table.png?raw=true)
 
-## 15. Variables d'environnement
+### 55. Variables d'environnement
 
 Le fichier .env.example a été mis à jour avec les variables de la base de données :
 DOCKERHUB_USER=votre_user_dockerhub
@@ -157,7 +250,7 @@ POSTGRES_PASSWORD=garderie_password
 POSTGRES_DB=garderie_db
 DATABASE_URL=postgresql://garderie_user:garderie_password@localhost:5432/garderie_db
 
-## 16. Tests applicatifs
+### 56. Tests applicatifs
 
 Test du frontend :
 cd frontend
@@ -172,24 +265,3 @@ npm test
 
 Capture du test API réussi :
 ![Test API](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-58-test-api.png?raw=true)
-
-## 12. Sécurité de l'API (OWASP API Security Top 10)
-
-Capture du tableau OWASP :
-![OWASP Table](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-52-owasp-table.png?raw=true)
-
-## 11. Validation et sécurité de l'API
-
-Capture du test avec des données invalides (Zod) :
-![Zod Error](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-48-zod-error.png?raw=true)
-
-Capture des headers de sécurité (Helmet) :
-![Helmet Headers](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-50-helmet-headers.png?raw=true)
-
-Capture du Rate Limiting (429 Too Many Requests) :
-![Rate Limit](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-51-rate-limit.png?raw=true)
-
-## 10. Route POST /api/contact
-
-Capture du succès de l'envoi du formulaire :
-![Contact Success](https://github.com/meryemelheni/garderie-devops/blob/main/screenshots/a4-47-contact-success.png?raw=true)
