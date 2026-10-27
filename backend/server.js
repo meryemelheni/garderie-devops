@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const { z } = require('zod');
+const { Pool } = require('pg');
 const app = express();
 const pool = new Pool({
     connectionString: "postgresql://garderie_user:garderie_password@localhost:5432/garderie_db"
@@ -8,7 +9,7 @@ const pool = new Pool({
 const PORT = process.env.PORT || 3001;
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const { Pool } = require('pg');
+
 app.use(cors());
 app.use(helmet());
 // Limiteur de requêtes pour la route contact
@@ -98,3 +99,4 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Backend Ma Garderie démarré sur le port ${PORT}`);
 });
+module.exports = app;
